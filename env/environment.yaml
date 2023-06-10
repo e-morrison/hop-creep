@@ -1,0 +1,4 @@
+name: hop-creep
+dependencies:
+  - python>=3.9
+  - pandas
