@@ -5,6 +5,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import re
+import os
 from pathlib import Path
 
 
@@ -55,8 +56,8 @@ def extract_column_headers(create_table_statements):
 
 def gen_file_out_name(sql_file):
     file_path = Path(sql_file)
-    new_path = file_path.with_parent(Path("data/merops_parsed"))
-    return str(new_path.with_suffix('.parquet'))
+    new_path = Path(file_path.name)
+    return 'data/merops_parsed/' + str(new_path.with_suffix('.parquet'))
 
 
 
@@ -91,9 +92,14 @@ if __name__ == "__main__":
     for sql_file in sql_files:
         data, column_headers = parse_merops_sql(sql_file)
 
+        # Check if MEROPS parsed path exists and, if not, create it
+        os.makedirs('data/merops_parsed', exist_ok=True)
+
         # Generate new file name for parsed file
         file_name_out = gen_file_out_name(sql_file)
+
+        # Save parsed data as a .parquet file
+        data.insert(0, column_headers)
         print(file_name_out)
-
-
+        save_parquet(data, file_name_out)
 
